@@ -3,7 +3,7 @@ set -e
 
 echo "🚀 Deploying Dev Ops Dashboard..."
 
-cd /home/azureuser/.openclaw/workspace/dev-ops-dashboard
+cd /home/azureuser/dev-ops-dashboard
 
 # Pull latest changes
 if [ -d ".git" ]; then
