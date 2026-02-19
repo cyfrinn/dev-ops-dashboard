@@ -1,0 +1,22 @@
+[Unit]
+Description=Dev Ops Dashboard Backend
+After=network.target
+
+[Service]
+Type=simple
+User=azureuser
+Group=azureuser
+WorkingDirectory=/home/azureuser/.openclaw/workspace/dev-ops-dashboard
+Environment=NODE_ENV=production
+Environment=HOST=0.0.0.0
+Environment=PORT=3001
+Environment=HOST=0.0.0.0
+ExecStart=/usr/bin/npm start
+Restart=on-failure
+RestartSec=10
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=dev-ops-dashboard
+
+[Install]
+WantedBy=multi-user.target
