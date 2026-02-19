@@ -1,0 +1,23 @@
+{
+  "name": "dashboard-backend",
+  "version": "1.0.0",
+  "description": "Backend API for Dev Ops Dashboard",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "automation": "node src/automation/orchestrator.js"
+  },
+  "dependencies": {
+    "express": "^4.18.0",
+    "mongoose": "^8.0.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.0",
+    "node-cron": "^3.0.0",
+    "axios": "^1.6.0",
+    "cheerio": "^1.0.0-rc.12"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.0"
+  }
+}

@@ -1,0 +1,9 @@
+
+> dashboard-backend@1.0.0 start
+> node src/server.js
+
+🚀 Dashboard backend running on port 3001
+📊 MongoDB Atlas connected
+✅ MongoDB connected successfully
+🛑 SIGTERM received. Shutting down gracefully...
+✅ Server closed
