@@ -23,11 +23,22 @@ const SOURCES = [
     type: 'html'
   },
   {
-    name: 'Product Hunt',
-    url: 'https://www.producthunt.com/',
-    selector: 'a[data-test="post-link"], h2[data-test="post-title"], .post-title',
+    name: 'TechCrunch',
+    url: 'https://techcrunch.com/feed/',
     maxItems: 10,
-    type: 'html'
+    type: 'rss',
+    itemSelector: 'item',
+    titlePath: 'title',
+    linkPath: 'link'
+  },
+  {
+    name: 'Dev.to',
+    url: 'https://dev.to/feed',
+    maxItems: 10,
+    type: 'rss',
+    itemSelector: 'item',
+    titlePath: 'title',
+    linkPath: 'link'
   }
 ];
 
@@ -42,22 +53,22 @@ const scrapeNews = async () => {
       console.log(`🔍 Scraping ${source.name}...`);
 
       try {
-        // Set headers per source
-        const headers = {
-          'User-Agent': source.name.includes('Reddit')
-            ? 'DashboardBot/1.0 (by /u/cyfrinn)'
-            : 'Mozilla/5.0 (compatible; DashboardBot/1.0)'
-        };
-
-        const response = await axios.get(source.url, {
-          headers,
-          timeout: 15000
-        });
-
         let items = [];
-        let $;
 
-        if (source.type === 'json') {
+        if (source.type === 'rss') {
+          // Parse RSS feed
+          const response = await axios.get(source.url, {
+            headers: { 'User-Agent': 'DashboardBot/1.0' },
+            timeout: 15000
+          });
+          const parser = new (require('rss-parser'))();
+          const feed = await parser.parseString(response.data);
+          items = feed.items.slice(0, source.maxItems);
+        } else if (source.type === 'json') {
+          const response = await axios.get(source.url, {
+            headers: { 'User-Agent': 'DashboardBot/1.0' },
+            timeout: 15000
+          });
           const json = response.data;
           const path = source.jsonPath || 'data';
           const parts = path.split('.');
@@ -68,7 +79,12 @@ const scrapeNews = async () => {
           }
           items = current || [];
         } else {
-          $ = cheerio.load(response.data);
+          // HTML scrape
+          const response = await axios.get(source.url, {
+            headers: { 'User-Agent': 'Mozilla/5.0 (compatible; DashboardBot/1.0)' },
+            timeout: 15000
+          });
+          const $ = cheerio.load(response.data);
           items = $(source.selector);
         }
 
@@ -77,7 +93,11 @@ const scrapeNews = async () => {
           let title = '';
           let href = '';
 
-          if (source.type === 'json') {
+          if (source.type === 'rss') {
+            const item = items[i];
+            title = item.title || '';
+            href = item.link || '';
+          } else if (source.type === 'json') {
             const item = items[i];
             const data = item.data || item;
             title = data.title || '';
