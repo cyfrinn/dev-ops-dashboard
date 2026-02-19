@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const fs = require('fs');
 const path = require('path');
+const axios = require('axios');
 require('dotenv').config();
 
 const SETTINGS_FILE = path.resolve(__dirname, '../../.env');
@@ -98,6 +99,31 @@ router.post('/', (req, res) => {
 
     res.json({ success: true, message: 'Settings saved' });
   } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// POST test Telegram notification
+router.post('/test-telegram', async (req, res) => {
+  try {
+    const botToken = process.env.TELEGRAM_BOT_TOKEN;
+    const chatId = process.env.TELEGRAM_CHAT_ID;
+
+    if (!botToken || !chatId) {
+      return res.status(400).json({ error: 'Telegram bot token or chat ID not configured' });
+    }
+
+    const message = `🔔 *Test Notification*\n\nThis is a test from your Dev Ops Dashboard. Your Telegram integration is working!`;
+
+    await axios.post(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+      chat_id: chatId,
+      text: message,
+      parse_mode: 'Markdown'
+    });
+
+    res.json({ success: true, message: 'Test message sent' });
+  } catch (error) {
+    console.error('Telegram test failed:', error.message);
     res.status(500).json({ error: error.message });
   }
 });
